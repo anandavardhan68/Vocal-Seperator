@@ -1,0 +1,33 @@
+const { s3Client } = require('../config/s3client');
+const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+exports.uploadurl = async (req, res) => {
+    try {
+        const fileName = req.body.filename;
+        const contentType = req.body.contentType;
+
+
+        if (!filename || !contentType) {
+            return res.status(400).json({ error: 'filename and contentType are required' });
+        }
+        const fileKey = `uploads/${Date.now()}-${fileName.replace(/\s+/g, "_")}`;
+
+        const upload_url = await getSignedUrl(s3Client, new PutObjectCommand({
+            Bucket: 'vocal-seperator',
+            Key: fileKey,
+            ContentType: contentType,
+        }), {
+            expiresIn: 300,
+
+        });
+
+        res.status(200).json({
+            message: 'success',
+            uploadUrl: upload_url,
+            fileKey: fileKey,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'failed to generate url', detail:err.message });
+    }
+}

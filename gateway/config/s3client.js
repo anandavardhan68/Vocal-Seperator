@@ -10,7 +10,7 @@ const s3Client = new S3Client({
         secretAccessKey: process.env.R2_SECRET_KEY,
     },
     requestChecksumCalculation: "WHEN_REQUIRED",
-    // ✅ REMOVED forcePathStyle — R2 uses virtual-hosted style
+  
 });
 
 module.exports = { s3Client };
